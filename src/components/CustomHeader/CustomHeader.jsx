@@ -8,7 +8,7 @@ function CustomHeader({ currentTime, isExpedienteOpen, setCurrentTime }) {
         <div className="flex items-center gap-2 mb-4 md:mb-0">
           <Monitor className="text-blue-600 w-8 h-8" />
           <div>
-            <h1 className="text-2xl font-bold text-gray-800">SysLab Atendimento</h1>
+            <h1 className="text-2xl font-bold text-gray-800">Web Ticket</h1>
             <p className="text-xs text-gray-500">Sistema de Gestão de Filas Laboratoriais</p>
           </div>
         </div>
