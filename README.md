@@ -44,12 +44,14 @@ O "cérebro" da aplicação que gerencia o estado global.
 
 O **WebTicket** implementa regras específicas para garantir fluidez e realismo na simulação:
 
-### 🔄 Ciclo de Prioridade (Round Robin)
-Para evitar inanição (starvation) de filas menos prioritárias, o sistema utiliza um ciclo de chamadas rotativo:
-1.  **SP** (Prioritário)
-2.  **SE** (Exames)
-3.  **SG** (Geral)
-*Caso a fila da vez esteja vazia, o sistema busca na próxima categoria do ciclo automaticamente.*
+### 🔄 Lógica de Prioridade (Alternância Ponderada)
+O sistema não utiliza um ciclo simples, mas sim uma lógica de alternância para garantir que a fila Prioritária (SP) tenha precedência sem bloquear totalmente as outras filas. A sequência ideal de chamadas segue o fluxo:
+
+`SP ➔ SE ➔ SP ➔ SG ➔ SP ➔ ...`
+
+1.  **Vez do Prioritário:** O sistema tenta chamar uma senha **SP**. Se atendida, passa a vez para as filas comuns.
+2.  **Vez do Comum:** O sistema alterna entre **SE** e **SG**.
+3.  **Fallback (Anti-Ociosidade):** Caso a fila da vez esteja vazia (ex: é a vez do SP, mas não há ninguém), o sistema busca automaticamente na próxima fila disponível (SE ou SG) para não parar o atendimento.
 
 ### ⏱️ Tempos de Atendimento (Probabilístico)
 Ao finalizar um atendimento, o tempo gasto (TM) é calculado aleatoriamente baseado no tipo de senha:
