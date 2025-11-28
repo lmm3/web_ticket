@@ -242,7 +242,7 @@ export default function LabQueueSystem() {
   // --- RENDERIZAÇÃO ---
 
   return (
-    <div className="min-h-screen bg-gray-100 font-sans text-gray-800 p-4">
+    <div className="min-h-screen w-full bg-gray-100 font-sans text-gray-800 p-4">
 
       {/* HEADER DO SISTEMA */}
       <CustomHeader
@@ -251,7 +251,7 @@ export default function LabQueueSystem() {
         setCurrentTime={setCurrentTime}
       />
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div className="grid w-full grid-cols-1 lg:grid-cols-12 gap-6">
 
         {/* COLUNA 1: AC - TOTEM (CLIENTE) */}
         <div className="lg:col-span-3">
@@ -283,7 +283,7 @@ export default function LabQueueSystem() {
       </div>
 
       {/* SEÇÃO DE DETALHES TÉCNICOS (RELATÓRIO DETALHADO) */}
-      <div className="mt-8">
+      <div className="mt-8 w-full">
         <LogTable tickets={allTickets} />
       </div>
     </div>
