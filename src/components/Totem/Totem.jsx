@@ -5,12 +5,6 @@ import TicketButton from '../TicketButton/TicketButton';
 import QueueCount from '../QueueCount/QueueCount'; 
 function Totem({ onIssueTicket, queues, isHighPriorityTurn, nextCommonType}) {
   const nextType = isHighPriorityTurn ? 'SP' : nextCommonType;
-
-  const getNextColor = () => {
-    if (nextType === 'SP') return 'text-red-600';
-    if (nextType === 'SE') return 'text-blue-600';
-    return 'text-green-600';
-  };
   
   return (
     <div className="space-y-6">
@@ -25,7 +19,7 @@ function Totem({ onIssueTicket, queues, isHighPriorityTurn, nextCommonType}) {
           <TicketButton type="SG" label="Geral" sub="Consultas" color="green" onClick={() => onIssueTicket('SG')} />
         </div>
         <div className="mt-auto pt-4 border-gray-700 text-center">
-          <p className="text-xs text-gray-500">Agente Sistema (AS) - Visualização Totem</p>
+          <p className="text-xs text-gray-500">Agente Sistema (AS) - Visualização Cliente</p>
         </div>
       </div>
       
