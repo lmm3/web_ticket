@@ -29,7 +29,9 @@ export default function LabQueueSystem() {
 
   // Controle de Sequência (Ciclo SP -> SE -> SG)
   // 0 = SP, 1 = SE, 2 = SG
-  const [priorityCycleIndex, setPriorityCycleIndex] = useState(0);
+  const [isHighPriorityTurn, setIsHighPriorityTurn] = useState(true); // Começa com SP
+  const [nextCommonType, setNextCommonType] = useState('SE'); // O primeiro comum é SE
+
 
   // Histórico e Painel
   const [allTickets, setAllTickets] = useState([]); // Log de tudo para relatório
@@ -104,82 +106,116 @@ export default function LabQueueSystem() {
   };
 
   // AS/AA: Lógica de Chamar Próxima Senha (Complexa baseada no diagrama)
-  const callNextTicket = () => {
-    if (!isExpedienteOpen && queueSP.length === 0 && queueSE.length === 0 && queueSG.length === 0) {
-      alert("Expediente encerrado e filas vazias.");
-      return;
+const callNextTicket = () => {
+  // 1. Verificação de segurança (Filas vazias)
+  if (!isExpedienteOpen && queueSP.length === 0 && queueSE.length === 0 && queueSG.length === 0) {
+    alert("Expediente encerrado e filas vazias.");
+    return;
+  }
+  
+  if (currentTicket) {
+    alert("Finalize o atendimento atual antes de chamar o próximo.");
+    return;
+  }
+
+  let nextTicket = null;
+  let ticketType = null;
+
+  // --- LÓGICA: SP -> (SE ou SG) -> SP -> (SG ou SE) ---
+
+  // Passo A: Tentar definir quem deveria ser chamado agora
+  if (isHighPriorityTurn) {
+    // É A VEZ DO SP
+    if (queueSP.length > 0) {
+      nextTicket = queueSP[0];
+      setQueueSP(prev => prev.slice(1));
+      ticketType = 'SP';
+      
+      // Se atendeu SP, passa a vez para os Comuns
+      setIsHighPriorityTurn(false); 
+    } else {
+      // SP está vazia? Não podemos parar. Vamos tentar atender um Comum.
+      // (Nota: mantemos isHighPriorityTurn = true para tentar SP de novo na próxima)
+      const fallback = tryCallCommon();
+      nextTicket = fallback.ticket;
+      ticketType = fallback.type;
     }
-
-    if (currentTicket) {
-      alert("Finalize o atendimento atual antes de chamar o próximo.");
-      return;
-    }
-
-    let nextTicket = null;
-    let attempts = 0;
-    let tempIndex = priorityCycleIndex;
-
-    // Tenta encontrar uma senha rodando o ciclo SP -> SE -> SG
-    // Tenta até 3 vezes (uma volta completa no ciclo)
-    while (!nextTicket && attempts < 3) {
-      if (tempIndex === 0) { // Vez da SP
-        if (queueSP.length > 0) {
-          nextTicket = queueSP[0];
-          setQueueSP(prev => prev.slice(1));
-        }
-      } else if (tempIndex === 1) { // Vez da SE
-        if (queueSE.length > 0) {
-          nextTicket = queueSE[0];
-          setQueueSE(prev => prev.slice(1));
-        }
-      } else if (tempIndex === 2) { // Vez da SG
-        if (queueSG.length > 0) {
-          nextTicket = queueSG[0];
-          setQueueSG(prev => prev.slice(1));
-        }
-      }
-
-      // Avança o ciclo para a próxima chamada
-      tempIndex = (tempIndex + 1) % 3;
-      attempts++;
-    }
-
-    // Atualiza o índice global do ciclo
-    setPriorityCycleIndex(tempIndex);
+  } else {
+    // É A VEZ DOS COMUNS (SE ou SG)
+    const result = tryCallCommon();
+    nextTicket = result.ticket;
+    ticketType = result.type;
 
     if (nextTicket) {
-      // Regra dos 5% de No-Show (Cliente desistiu)
-      const isNoShow = Math.random() < 0.05;
-
-      if (isNoShow) {
-        updateTicketStatus(nextTicket.id, 'no-show');
-        // Se for no-show, chamamos a próxima recursivamente ou mostramos aviso?
-        // Para simplificar a UI, vamos apenas mostrar que foi chamado e marcado como ausente
-        // mas não vamos ocupar o guichê (chama o próximo automaticamente na vida real, 
-        // mas aqui vamos deixar o atendente clicar de novo para ver o log).
-      }
-
-      // Define como atual e atualiza status
-      const updatedTicket = {
-        ...nextTicket,
-        attendTime: currentTime,
-        status: isNoShow ? 'no-show' : 'active'
-      };
-
-      if (!isNoShow) {
-        setCurrentTicket(updatedTicket);
-      }
-
-      updateTicketStatus(nextTicket.id, isNoShow ? 'no-show' : 'active', currentTime);
-
-      // Atualiza Painel (apenas se não for no-show ou se quisermos mostrar que foi chamado)
-      // O prompt diz "5 últimas senhas chamadas".
-      setPanelHistory(prev => [updatedTicket, ...prev].slice(0, 5));
-
+      // Se atendeu um comum, a próxima OBRIGATORIAMENTE é SP
+      setIsHighPriorityTurn(true);
     } else {
-      alert("Não há senhas nas filas no momento.");
+      // Se os dois comuns (SE e SG) estão vazios, tenta salvar com um SP
+      if (queueSP.length > 0) {
+        nextTicket = queueSP[0];
+        setQueueSP(prev => prev.slice(1));
+        ticketType = 'SP';
+        // Mantemos a vez como 'false' para tentar atender um comum assim que chegar alguém
+      }
     }
-  };
+  }
+
+  // Função auxiliar para gerenciar a alternância SE <-> SG
+  function tryCallCommon() {
+    let selected = null;
+    let type = null;
+    
+    // Tenta o preferido (ex: SE)
+    if (nextCommonType === 'SE') {
+      if (queueSE.length > 0) {
+        selected = queueSE[0];
+        setQueueSE(prev => prev.slice(1));
+        type = 'SE';
+        setNextCommonType('SG'); // Próximo comum será SG
+      } else if (queueSG.length > 0) {
+        // SE vazia? Pega SG (conforme seu exemplo)
+        selected = queueSG[0];
+        setQueueSG(prev => prev.slice(1));
+        type = 'SG';
+        setNextCommonType('SE'); // Alterna mesmo assim, para manter o fluxo
+      }
+    } else { 
+      // Vez do SG
+      if (queueSG.length > 0) {
+        selected = queueSG[0];
+        setQueueSG(prev => prev.slice(1));
+        type = 'SG';
+        setNextCommonType('SE'); // Próximo comum será SE
+      } else if (queueSE.length > 0) {
+        // SG vazia? Pega SE
+        selected = queueSE[0];
+        setQueueSE(prev => prev.slice(1));
+        type = 'SE';
+        setNextCommonType('SG'); // Alterna
+      }
+    }
+    return { ticket: selected, type };
+  }
+
+  // --- FIM DA LÓGICA ---
+
+  if (nextTicket) {
+    // ... Código padrão de atendimento (No-show, log, etc) ...
+    const isNoShow = Math.random() < 0.05;
+    // ... (Copiar o restante da sua função original aqui)
+     if (isNoShow) {
+        updateTicketStatus(nextTicket.id, 'no-show');
+        // Se deu no-show, você pode decidir se chama o próximo recursivamente ou espera o clique.
+      } else {
+        const updatedTicket = { ...nextTicket, attendTime: currentTime, status: 'active' };
+        setCurrentTicket(updatedTicket);
+        updateTicketStatus(nextTicket.id, 'active', currentTime);
+        setPanelHistory(prev => [updatedTicket, ...prev].slice(0, 5));
+      }
+  } else {
+    alert("Não há senhas nas filas no momento.");
+  }
+};
 
   // AA: Finalizar Atendimento
   const finishService = () => {
@@ -258,7 +294,8 @@ export default function LabQueueSystem() {
           <Totem
             onIssueTicket={handleIssueTicket}
             queues={{ SP: queueSP, SE: queueSE, SG: queueSG }}
-            priorityCycleIndex={priorityCycleIndex}
+            isHighPriorityTurn={isHighPriorityTurn}
+            nextCommonType={nextCommonType}
           />
         </div>
 

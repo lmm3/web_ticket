@@ -3,7 +3,15 @@ import React from 'react';
 import { Users } from 'lucide-react';
 import TicketButton from '../TicketButton/TicketButton';
 import QueueCount from '../QueueCount/QueueCount'; 
-export default function Totem({ onIssueTicket, queues, priorityCycleIndex }) {
+function Totem({ onIssueTicket, queues, isHighPriorityTurn, nextCommonType}) {
+  const nextType = isHighPriorityTurn ? 'SP' : nextCommonType;
+
+  const getNextColor = () => {
+    if (nextType === 'SP') return 'text-red-600';
+    if (nextType === 'SE') return 'text-blue-600';
+    return 'text-green-600';
+  };
+  
   return (
     <div className="space-y-6">
       <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
@@ -27,9 +35,11 @@ export default function Totem({ onIssueTicket, queues, priorityCycleIndex }) {
            <QueueCount label="SG" count={queues.SG.length} color="green" />
         </div>
         <div className="mt-2 text-xs text-center text-gray-400">
-           Próxima Prioridade: <span className="font-bold text-gray-600">{['SP', 'SE', 'SG'][priorityCycleIndex]}</span>
+           Próxima Prioridade: <span className="font-bold text-gray-600">{nextType}</span>
         </div>
       </div>
     </div>
   );
 }
+
+export default Totem;
