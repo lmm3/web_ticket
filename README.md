@@ -2,6 +2,8 @@
 
 O **WebTicket** é uma aplicação que simula um sistema inteligente de gerenciamento de filas para laboratórios de análises clínicas. O projeto implementa uma arquitetura baseada em **Sistemas Multiagentes**, orquestrando a interação entre a retirada de senhas, o atendimento nos guichês e o gerenciamento temporal do fluxo de pacientes.
 
+A especificação completa pode ser encontrada em [Sistema para controle de atendimento](./Sistema%20para%20controle%20de%20atendimento.pdf).
+
 ---
 
 ## 👨‍💻 Autores
