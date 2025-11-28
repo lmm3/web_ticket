@@ -1,7 +1,7 @@
 import React from 'react';
 import Clock24 from '../Clock24/Clock24';
-import StatusBadge from '../StatusBadge/StatusBadge';
 import SimulationControls from '../SimulationControls/SimulationControls';
+import ClockStatusBadge from '../ClockStatusBadge/ClockStatusBadge';
 
 
 // Componente Filho: Apenas renderiza e manda comandos de volta pro pai
@@ -13,7 +13,7 @@ const SystemClock = ({ currentTime, isOpen, onTimeChange }) => {
       <Clock24 currentTime={currentTime} />
       
       {/* Badge de Status */}
-      <StatusBadge isOpen={isOpen} />
+      <ClockStatusBadge isOpen={isOpen} />
       
       {/* Controles de Simulação */}
       <SimulationControls onTimeChange={onTimeChange} />
