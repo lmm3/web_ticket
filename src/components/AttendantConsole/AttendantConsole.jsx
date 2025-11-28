@@ -56,6 +56,9 @@ function AttendantConsole({ currentTicket, onCallNext, onFinish, isExpedienteOpe
           <CheckCircle className="w-4 h-4" /> Finalizar
         </button>
       </div>
+      <div className="mt-auto pt-4  border-gray-700 text-center">
+         <p className="text-xs text-gray-500">Agente Atendente (AA) - Visualização Atendente</p>
+      </div>
     </div>
   );
 }

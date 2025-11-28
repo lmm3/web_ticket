@@ -24,7 +24,11 @@ function Totem({ onIssueTicket, queues, isHighPriorityTurn, nextCommonType}) {
           <TicketButton type="SE" label="Retirada Exames" sub="Rápido" color="blue" onClick={() => onIssueTicket('SE')} />
           <TicketButton type="SG" label="Geral" sub="Consultas" color="green" onClick={() => onIssueTicket('SG')} />
         </div>
+        <div className="mt-auto pt-4 border-gray-700 text-center">
+          <p className="text-xs text-gray-500">Agente Totem (AT) - Visualização Totem</p>
+        </div>
       </div>
+      
 
       {/* Mini Dashboard das Filas */}
       <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
