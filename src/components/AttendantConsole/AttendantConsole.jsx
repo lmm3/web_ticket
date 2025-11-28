@@ -13,7 +13,7 @@ function AttendantConsole({ currentTicket, onCallNext, onFinish, isExpedienteOpe
   return (
     <div className="bg-white p-6 rounded-lg shadow-md border-t-4 border-indigo-500">
       <h2 className="text-lg font-bold mb-4 flex items-center gap-2 text-indigo-900">
-        <Monitor className="w-5 h-5" /> Console do Atendente
+        <Monitor className="w-5 h-5" /> Console do Atendente (Guichê 1)
       </h2>
 
       {/* Display do Guichê */}

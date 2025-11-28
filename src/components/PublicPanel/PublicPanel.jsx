@@ -56,7 +56,7 @@ function PublicPanel({ history = [] }) {
       </div>
       
       <div className="mt-auto pt-4 border-t border-gray-700 text-center">
-         <p className="text-xs text-gray-500">Agente Sistema (AS) - Visualização Pública</p>
+         <p className="text-xs text-gray-500">Agente Client (AC) - Visualização Pública</p>
       </div>
     </div>
   );
